@@ -59,6 +59,6 @@ Drift Contract: Spec-Anchored (`HANDOFF.md`)
   - Verify: Unit Test: Jawab 4 dari 5 soal benar @20 poin, assert skor = 80.
   - Status: PENDING
 
-- [ ] **AC-14**: WHEN admin mengeklik blok jadwal pada timetable grid, THE system SHALL menampilkan popover penjelasan algoritma (alasan penempatan dosen, kapasitas, preferensi).
+- [x] **AC-14**: WHEN admin mengeklik blok jadwal pada timetable grid, THE system SHALL menampilkan popover penjelasan algoritma (alasan penempatan dosen, kapasitas, preferensi).
   - Verify: Component Test: Click card, assert modal/popover explanation tampil.
-  - Status: PENDING
+  - Status: VERIFIED (resources/js/Pages/Admin/ScheduleWorkspace.tsx, Audit Trail inspector sheet, tested in ScheduleControllerTest)

@@ -7,17 +7,17 @@ Drift Contract: Spec-Anchored (`HANDOFF.md`)
 
 ## Acceptance Criteria Tracker
 
-- [ ] **AC-1**: WHEN admin menjalankan solver penjadwalan, THE system SHALL mengalokasikan kelas ke slot & ruangan tanpa melanggar Hard Constraints (HC1-HC5).
+- [x] **AC-1**: WHEN admin menjalankan solver penjadwalan, THE system SHALL mengalokasikan kelas ke slot & ruangan tanpa melanggar Hard Constraints (HC1-HC5).
   - Verify: Feature Test: Test solver dengan 30 kelas dummy menghasilkan 0 room & dosen overlap.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/SchedulingIntegrationTest.php, 70 assertions, 0 collisions)
 
-- [ ] **AC-2**: IF terdapat kelas yang tidak menemukan slot bebas bentrok, THEN THE system SHALL mencatatnya pada `schedule_conflicts` dan menampilkan radar bentrok ke admin.
+- [x] **AC-2**: IF terdapat kelas yang tidak menemukan slot bebas bentrok, THEN THE system SHALL mencatatnya pada `schedule_conflicts` dan menampilkan radar bentrok ke admin.
   - Verify: Unit Test: Injeksi kasus over-capacity/over-constraint, assert conflict record tercipta.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Unit/SchedulingEngineTest.php::test_unsatisfiable_constraints_record_conflicts_ac2)
 
-- [ ] **AC-3**: WHILE kelas memiliki flag `is_pinned = true`, THE solver SHALL mempertahankan ruangan dan slot waktu tersebut tanpa memindahkannya.
+- [x] **AC-3**: WHILE kelas memiliki flag `is_pinned = true`, THE solver SHALL mempertahankan ruangan dan slot waktu tersebut tanpa memindahkannya.
   - Verify: Unit Test: Pin satu kelas, jalankan solver, assert slot tetap sama.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Unit/SchedulingEngineTest.php::test_pinned_class_remains_unmoved_ac3)
 
 - [ ] **AC-4**: WHEN mahasiswa memilih matkul pada periode KRS, THE system SHALL memvalidasi total SKS tidak melebihi batas SKS berdasarkan IPS semester sebelumnya.
   - Verify: Feature Test: Coba ambil 24 SKS saat batas IPS hanya mengizinkan 20 SKS, assert validasi 422.

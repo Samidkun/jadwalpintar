@@ -19,21 +19,21 @@ Drift Contract: Spec-Anchored (`HANDOFF.md`)
   - Verify: Unit Test: Pin satu kelas, jalankan solver, assert slot tetap sama.
   - Status: VERIFIED (tests/Unit/SchedulingEngineTest.php::test_pinned_class_remains_unmoved_ac3)
 
-- [ ] **AC-4**: WHEN mahasiswa memilih matkul pada periode KRS, THE system SHALL memvalidasi total SKS tidak melebihi batas SKS berdasarkan IPS semester sebelumnya.
+- [x] **AC-4**: WHEN mahasiswa memilih matkul pada periode KRS, THE system SHALL memvalidasi total SKS tidak melebihi batas SKS berdasarkan IPS semester sebelumnya.
   - Verify: Feature Test: Coba ambil 24 SKS saat batas IPS hanya mengizinkan 20 SKS, assert validasi 422.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/KrsPortalTest.php::test_rejects_krs_exceeding_max_sks_limit_ac4)
 
-- [ ] **AC-5**: IF mahasiswa memilih dua kelas dengan jadwal waktu yang beririsan, THEN THE system SHALL menolak pengajuan dan menampilkan pesan bentrok jadwal.
+- [x] **AC-5**: IF mahasiswa memilih dua kelas dengan jadwal waktu yang beririsan, THEN THE system SHALL menolak pengajuan dan menampilkan pesan bentrok jadwal.
   - Verify: Feature Test: Submit 2 kelas di slot yang sama, assert error bentrok.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/KrsPortalTest.php::test_rejects_krs_with_schedule_time_collision_ac5)
 
-- [ ] **AC-6**: WHEN mahasiswa belum lulus mata kuliah prasyarat, THE system SHALL melarang pemilihan mata kuliah lanjutan tersebut pada formulir KRS.
+- [x] **AC-6**: WHEN mahasiswa belum lulus mata kuliah prasyarat, THE system SHALL melarang pemilihan mata kuliah lanjutan tersebut pada formulir KRS.
   - Verify: Feature Test: Submit matkul prasyarat belum diambil, assert rejection.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/KrsPortalTest.php::test_rejects_krs_when_prerequisite_not_passed_ac6)
 
-- [ ] **AC-7**: WHEN dosen Pembimbing Akademik menyetujui (approve) KRS mahasiswa, THE status KRS SHALL berubah menjadi `approved` dan kelas resmi terdaftar.
+- [x] **AC-7**: WHEN dosen Pembimbing Akademik menyetujui (approve) KRS mahasiswa, THE status KRS SHALL berubah menjadi `approved` dan kelas resmi terdaftar.
   - Verify: Feature Test: Dosen approve KRS, assert status update & record terdaftar.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/KrsPortalTest.php::test_dosen_pa_can_approve_krs_ac7)
 
 - [ ] **AC-8**: WHEN dosen menginput komponen nilai mahasiswa (tugas, quiz, uts, uas), THE system SHALL menghitung nilai akhir, huruf mutu (A-E), dan bobot (0.00-4.00) secara otomatis.
   - Verify: Unit Test: Injeksi angka 85, assert huruf 'A' dan bobot 4.00.

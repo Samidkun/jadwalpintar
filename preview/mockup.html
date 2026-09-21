@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-[#F5F5F7] text-[#1D1D1F]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JadwalPintar — Studio Penjadwalan Akademik</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=SF+Mono:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"SF Mono"', '"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            apple: {
+              canvas: '#F5F5F7',
+              card: '#FFFFFF',
+              subtle: '#FBFBFD',
+              border: 'rgba(0, 0, 0, 0.07)',
+              'border-strong': 'rgba(0, 0, 0, 0.12)',
+              text: '#1D1D1F',
+              secondary: '#86868B',
+              tertiary: '#A1A1A6',
+              blue: '#0071E3',
+              'blue-hover': '#0077ED',
+              green: '#34C759',
+              orange: '#FF9500',
+              red: '#FF3B30',
+              purple: '#AF52DE',
+            }
+          },
+          boxShadow: {
+            'apple-sm': '0 1px 2px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.08)',
+            'apple-card': '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.08)',
+            'apple-pill': '0 1px 3px rgba(0, 0, 0, 0.08), 0 0.5px 1px rgba(0, 0, 0, 0.04)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Plus Jakarta Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .font-mono {
+      font-family: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+      font-feature-settings: "tnum";
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
+  </style>
+</head>
+<body class="h-full flex flex-col overflow-hidden text-[13px] leading-relaxed select-none antialiased bg-[#F5F5F7] p-3 md:p-4">
+
+  <!-- macOS WINDOW FRAME CONTAINER (Craft / Apple Desktop Pro App) -->
+  <div class="h-full w-full flex flex-col bg-white rounded-2xl shadow-apple-card border border-apple-border overflow-hidden">
+
+    <!-- UNIFIED TOP TOOLBAR & macOS WINDOW HEADER -->
+    <header class="h-13 bg-[#FBFBFD] border-b border-apple-border px-4 py-2.5 flex items-center justify-between shrink-0">
+      <!-- Window Controls & Breadcrumb -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-1.5">
+          <span class="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/40 inline-block shadow-2xs"></span>
+          <span class="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/40 inline-block shadow-2xs"></span>
+          <span class="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/40 inline-block shadow-2xs"></span>
+        </div>
+
+        <div class="h-4 w-px bg-black/10"></div>
+
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-xs tracking-tight text-apple-text">JadwalPintar</span>
+          <span class="text-apple-tertiary">/</span>
+          <span class="text-apple-secondary text-xs">Penjadwalan Otomatis</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#F5F5F7] text-apple-secondary border border-black/5 font-mono">2025/1 Ganjil</span>
+        </div>
+      </div>
+
+      <!-- Segmented State Switcher (Apple Inset Control) -->
+      <div class="flex items-center gap-1 bg-[#EBEBED] p-0.5 rounded-lg border border-black/5">
+        <span class="text-[10px] text-apple-secondary font-medium px-2">State:</span>
+        <button onclick="switchState('optimal')" id="btn-optimal" class="px-2.5 py-1 text-[11px] font-medium rounded-md bg-white text-apple-text shadow-apple-pill transition-all">1. Optimal (32/32)</button>
+        <button onclick="switchState('conflict')" id="btn-conflict" class="px-2.5 py-1 text-[11px] font-medium rounded-md text-apple-secondary hover:text-apple-text transition-all">2. Bentrok (HC-2)</button>
+        <button onclick="switchState('solving')" id="btn-solving" class="px-2.5 py-1 text-[11px] font-medium rounded-md text-apple-secondary hover:text-apple-text transition-all">3. Solver Loop</button>
+        <button onclick="switchState('empty')" id="btn-empty" class="px-2.5 py-1 text-[11px] font-medium rounded-md text-apple-secondary hover:text-apple-text transition-all">4. Kosong</button>
+      </div>
+
+      <!-- Action Area -->
+      <div class="flex items-center gap-2">
+        <button onclick="triggerSolve()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-apple-blue text-white hover:bg-apple-blue-hover shadow-apple-sm transition flex items-center gap-1.5 active:scale-[0.98]">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Jalankan Solver</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- WORKSPACE CANVAS BODY -->
+    <div class="flex-1 flex overflow-hidden">
+
+      <!-- LEFT SIDEBAR: Clean Apple Mac Pro Sidebar -->
+      <aside class="w-52 bg-[#FBFBFD] border-r border-apple-border flex flex-col justify-between shrink-0">
+        <div class="p-2 space-y-4">
+          <!-- Quick Status Card -->
+          <div class="p-3 bg-white rounded-xl border border-apple-border shadow-apple-sm">
+            <div class="flex items-center justify-between text-[11px] mb-1">
+              <span class="text-apple-secondary font-medium">Kapasitas Kampus</span>
+              <span class="text-apple-green font-semibold">Aktif</span>
+            </div>
+            <p class="text-lg font-bold text-apple-text font-mono tracking-tight" id="sidebar-stat-classes">32 <span class="text-xs font-normal text-apple-secondary font-sans">Kelas</span></p>
+            <div class="w-full bg-[#EBEBED] rounded-full h-1.5 mt-2 overflow-hidden">
+              <div class="bg-apple-blue h-1.5 rounded-full" style="width: 100%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-apple-secondary font-mono mt-1.5">
+              <span>8 Ruangan</span>
+              <span>18 Dosen</span>
+            </div>
+          </div>
+
+          <!-- Navigation Groups -->
+          <div class="space-y-1">
+            <p class="px-2 text-[10px] font-semibold text-apple-secondary tracking-wider uppercase font-mono">Modul Akademik</p>
+            <a href="#" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-apple-secondary hover:bg-black/5 transition text-xs font-medium">
+              <svg class="w-4 h-4 text-apple-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              <span>Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-apple-secondary hover:bg-black/5 transition text-xs font-medium">
+              <svg class="w-4 h-4 text-apple-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <span>Master Data</span>
+            </a>
+            <a href="#" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-apple-blue/10 text-apple-blue font-semibold text-xs shadow-2xs">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-apple-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Jadwal Terpadu</span>
+              </div>
+              <span class="w-1.5 h-1.5 rounded-full bg-apple-blue"></span>
+            </a>
+            <a href="#" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-apple-secondary hover:bg-black/5 transition text-xs font-medium">
+              <svg class="w-4 h-4 text-apple-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Rencana Studi (KRS)</span>
+            </a>
+            <a href="#" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-apple-secondary hover:bg-black/5 transition text-xs font-medium">
+              <svg class="w-4 h-4 text-apple-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              <span>Buku Nilai (KHS)</span>
+            </a>
+            <a href="#" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-apple-secondary hover:bg-black/5 transition text-xs font-medium">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-apple-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                <span>Mini Quiz</span>
+              </div>
+              <span class="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-black/5 text-apple-secondary">Gambar</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- User Profile Pill -->
+        <div class="p-3 border-t border-apple-border flex items-center justify-between">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-6 h-6 rounded-full bg-[#E5E5EA] text-apple-text font-bold text-[10px] flex items-center justify-center">BA</div>
+            <div class="truncate">
+              <p class="text-xs font-semibold text-apple-text truncate">Biro Akademik</p>
+              <p class="text-[10px] text-apple-secondary truncate font-mono">admin@kharisma.ac.id</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER: TIMETABLE CALENDAR GRID -->
+      <main class="flex-1 flex flex-col min-w-0 bg-[#F5F5F7] overflow-hidden">
+        
+        <!-- SUB-TOOLBAR / FILTER BAR -->
+        <div class="h-11 px-5 bg-white/70 backdrop-blur-md border-b border-apple-border flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-apple-secondary font-medium">Tampilan:</span>
+              <select class="bg-white border border-apple-border rounded-lg px-2.5 py-1 text-xs text-apple-text font-medium shadow-apple-sm focus:outline-none focus:ring-1 focus:ring-apple-blue">
+                <option>Semua Ruangan Kuliah (8 Unit)</option>
+                <option>Gedung A • R.301 (Teori)</option>
+                <option>Gedung A • R.302 (Teori)</option>
+                <option>Gedung B • Lab Komputer 01 (Praktikum)</option>
+              </select>
+            </div>
+            <span class="h-3 w-px bg-black/10"></span>
+            <div class="flex items-center gap-1.5 text-xs text-apple-secondary">
+              <span class="w-2 h-2 rounded-full bg-apple-blue"></span>
+              <span class="text-[11px] font-medium">Informatika</span>
+              <span class="w-2 h-2 rounded-full bg-apple-purple ml-2"></span>
+              <span class="text-[11px] font-medium">Sistem Informasi</span>
+              <span class="w-2 h-2 rounded-full bg-apple-orange ml-2"></span>
+              <span class="text-[11px] font-medium">Bisnis Digital</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5 text-[11px] font-mono text-apple-secondary" id="solver-metric-badge">
+              <span class="w-1.5 h-1.5 rounded-full bg-apple-green"></span>
+              <span>Solusi: 38ms (0 Pelanggaran)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MATRIX CALENDAR CONTAINER -->
+        <div class="flex-1 overflow-auto p-4" id="matrix-scroll-area">
+          <div class="bg-white rounded-2xl border border-apple-border shadow-apple-sm overflow-hidden flex flex-col min-w-[760px]">
+            <!-- Day Column Headers -->
+            <div class="grid grid-cols-6 border-b border-apple-border bg-[#FBFBFD] text-[11px] font-semibold text-apple-secondary uppercase tracking-wider font-mono">
+              <div class="p-2.5 text-center border-r border-apple-border">Waktu / Slot</div>
+              <div class="p-2.5 text-center border-r border-apple-border">Senin</div>
+              <div class="p-2.5 text-center border-r border-apple-border">Selasa</div>
+              <div class="p-2.5 text-center border-r border-apple-border">Rabu</div>
+              <div class="p-2.5 text-center border-r border-apple-border">Kamis</div>
+              <div class="p-2.5 text-center">Jumat</div>
+            </div>
+
+            <!-- Dynamic Timetable Rows -->
+            <div id="matrix-rows-container" class="divide-y divide-apple-border">
+              <!-- Content injected by JS -->
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- RIGHT INSPECTOR PANE: Craft Sheet / Property Inspector -->
+      <aside class="w-80 bg-white border-l border-apple-border flex flex-col justify-between shrink-0 overflow-y-auto">
+        <div class="p-4 space-y-4">
+          
+          <!-- Inspector Header -->
+          <div class="flex items-center justify-between pb-3 border-b border-apple-border">
+            <div>
+              <h3 class="font-bold text-xs text-apple-text tracking-tight uppercase font-mono">Inspector Alokasi</h3>
+              <p class="text-[11px] text-apple-secondary">Klik pada jadwal untuk audit constraint</p>
+            </div>
+            <span id="inspect-code" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#F5F5F7] text-apple-text border border-black/5">TIF204-A</span>
+          </div>
+
+          <!-- Class Profile Group -->
+          <div class="space-y-3">
+            <div>
+              <p class="text-[11px] text-apple-secondary font-medium">Mata Kuliah</p>
+              <h4 class="text-base font-bold text-apple-text leading-tight mt-0.5" id="inspect-title">Kalkulus Lanjut</h4>
+              <div class="flex items-center gap-2 mt-1 font-mono text-[11px] text-apple-secondary">
+                <span class="px-1.5 py-0.2 rounded bg-black/5 text-apple-text font-medium" id="inspect-sks">3 SKS Teori</span>
+                <span>•</span>
+                <span id="inspect-semester">Semester 3</span>
+                <span>•</span>
+                <span id="inspect-enrolled">38 Mahasiswa</span>
+              </div>
+            </div>
+
+            <!-- Lecturer Card -->
+            <div class="p-3 bg-[#FBFBFD] rounded-xl border border-apple-border">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-apple-secondary font-medium">Dosen Pengampu</span>
+                <span class="font-mono text-apple-tertiary">0412088501</span>
+              </div>
+              <p class="text-xs font-bold text-apple-text mt-1" id="inspect-dosen">Dr. Ir. Hendra Kusuma, M.T.</p>
+              <div class="flex items-center gap-1.5 text-[10px] text-apple-green font-medium mt-1.5">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                <span>Preferensi: Sesi Pagi Terpenuhi (+10)</span>
+              </div>
+            </div>
+
+            <!-- Room & Time Group -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="p-2.5 bg-[#FBFBFD] rounded-xl border border-apple-border">
+                <span class="text-[10px] text-apple-secondary font-mono block uppercase">Ruang Kuliah</span>
+                <span class="font-bold text-xs text-apple-text block mt-0.5 truncate" id="inspect-room">R.301 Gedung A</span>
+                <span class="text-[10px] text-apple-secondary block font-mono mt-0.5">Kapasitas 45</span>
+              </div>
+              <div class="p-2.5 bg-[#FBFBFD] rounded-xl border border-apple-border">
+                <span class="text-[10px] text-apple-secondary font-mono block uppercase">Slot Terpilih</span>
+                <span class="font-bold text-xs text-apple-text block mt-0.5" id="inspect-time">Senin, 08:00</span>
+                <span class="text-[10px] text-apple-green block font-medium mt-0.5">Bebas Bentrok</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CRAFT AUDIT LOG: EXPLAINABILITY (Why this was placed here) -->
+          <div class="space-y-2 pt-2 border-t border-apple-border">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-apple-text uppercase tracking-tight font-mono">Alasan Solver (Audit)</span>
+              <span class="text-[10px] font-mono font-semibold text-apple-blue bg-apple-blue/10 px-2 py-0.5 rounded-full">Score 96%</span>
+            </div>
+            <div class="p-3 bg-[#FBFBFD] rounded-xl border border-apple-border space-y-2.5 text-[11px] text-apple-secondary leading-relaxed">
+              <div class="flex items-start gap-2">
+                <div class="w-4 h-4 rounded-full bg-apple-green/10 text-apple-green flex items-center justify-center shrink-0 mt-0.5">
+                  <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                </div>
+                <span><strong>HC-1 & HC-2 Lolos:</strong> Tidak ada bentrok ruangan atau jadwal mengajar dosen lain pada slot Senin 08:00.</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <div class="w-4 h-4 rounded-full bg-apple-green/10 text-apple-green flex items-center justify-center shrink-0 mt-0.5">
+                  <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                </div>
+                <span><strong>HC-3 Kapasitas Cukup:</strong> Ruangan 45 kursi menyisakan margin aman 7 kursi cadangan untuk mahasiswa pengulang.</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <div class="w-4 h-4 rounded-full bg-apple-blue/10 text-apple-blue flex items-center justify-center shrink-0 mt-0.5">
+                  <span class="text-[10px] font-bold">★</span>
+                </div>
+                <span><strong>SC-1 Preferensi Dosen:</strong> Jadwal selaras dengan pengajuan jadwal mengajar pagi hari Dr. Hendra Kusuma.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- MANUAL OVERRIDE ACTIONS -->
+          <div class="space-y-2 pt-2 border-t border-apple-border">
+            <div class="flex items-center gap-2">
+              <button class="flex-1 py-2 px-3 bg-[#FBFBFD] hover:bg-black/5 rounded-xl border border-apple-border text-xs font-semibold text-apple-text transition shadow-2xs flex items-center justify-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-apple-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <span>Kunci (Pin) Slot</span>
+              </button>
+              <button class="py-2 px-3 bg-[#FBFBFD] hover:bg-black/5 rounded-xl border border-apple-border text-xs font-semibold text-apple-text transition shadow-2xs">
+                Tukar Ruang
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- FOOTER STATUS SUMMARY -->
+        <div class="p-3 bg-[#FBFBFD] border-t border-apple-border flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-apple-green"></span>
+            <span class="text-xs font-medium text-apple-text" id="status-footer-text">32 / 32 Kelas Terjadwal</span>
+          </div>
+          <span class="text-[10px] font-mono text-apple-secondary">Ready to Publish</span>
+        </div>
+      </aside>
+
+    </div>
+
+  </div>
+
+  <script>
+    const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+
+    const classesData = [
+      {
+        id: 'TIF204-A',
+        title: 'Kalkulus Lanjut',
+        day: 'Senin',
+        time: '08:00 - 10:30',
+        slotIdx: 0,
+        room: 'Gedung A • R.301',
+        dosen: 'Dr. Ir. Hendra Kusuma, M.T.',
+        sks: '3 SKS Teori',
+        semester: 'Semester 3',
+        enrolled: '38 Mahasiswa',
+        tagBg: 'bg-blue-50 text-apple-blue border-blue-100',
+        accentBar: 'bg-apple-blue',
+        score: '96%'
+      },
+      {
+        id: 'SI102-B',
+        title: 'Algoritma & Pemrograman',
+        day: 'Selasa',
+        time: '08:00 - 10:30',
+        slotIdx: 0,
+        room: 'Lab Komputer 01',
+        dosen: 'Ahmad Zaki, M.Kom.',
+        sks: '3 SKS Praktikum',
+        semester: 'Semester 1',
+        enrolled: '32 Mahasiswa',
+        tagBg: 'bg-purple-50 text-apple-purple border-purple-100',
+        accentBar: 'bg-apple-purple',
+        score: '98%'
+      },
+      {
+        id: 'TIF301-A',
+        title: 'Basis Data II',
+        day: 'Rabu',
+        time: '10:45 - 13:15',
+        slotIdx: 1,
+        room: 'Gedung A • R.302',
+        dosen: 'Siti Rahmawati, M.Cs.',
+        sks: '3 SKS Teori',
+        semester: 'Semester 3',
+        enrolled: '42 Mahasiswa',
+        tagBg: 'bg-blue-50 text-apple-blue border-blue-100',
+        accentBar: 'bg-apple-blue',
+        score: '92%'
+      },
+      {
+        id: 'BD105-A',
+        title: 'Pengantar Bisnis Digital',
+        day: 'Kamis',
+        time: '08:00 - 10:30',
+        slotIdx: 0,
+        room: 'Gedung A • R.304',
+        dosen: 'Drs. Bambang Sudarsono, M.M.',
+        sks: '2 SKS Teori',
+        semester: 'Semester 1',
+        enrolled: '25 Mahasiswa',
+        tagBg: 'bg-orange-50 text-apple-orange border-orange-100',
+        accentBar: 'bg-apple-orange',
+        score: '90%'
+      },
+      {
+        id: 'TIF402-A',
+        title: 'Keamanan Siber Terapan',
+        day: 'Kamis',
+        time: '13:30 - 16:00',
+        slotIdx: 2,
+        room: 'Lab Jaringan Komputer',
+        dosen: 'Dr. Ir. Hendra Kusuma, M.T.',
+        sks: '3 SKS Praktikum',
+        semester: 'Semester 5',
+        enrolled: '28 Mahasiswa',
+        tagBg: 'bg-blue-50 text-apple-blue border-blue-100',
+        accentBar: 'bg-apple-blue',
+        score: '95%'
+      },
+      {
+        id: 'BD202-B',
+        title: 'Analitik E-Commerce',
+        day: 'Jumat',
+        time: '13:30 - 15:30',
+        slotIdx: 2,
+        room: 'Gedung A • R.304',
+        dosen: 'Nadia Putri, M.M.',
+        sks: '2 SKS Teori',
+        semester: 'Semester 3',
+        enrolled: '30 Mahasiswa',
+        tagBg: 'bg-orange-50 text-apple-orange border-orange-100',
+        accentBar: 'bg-apple-orange',
+        score: '89%'
+      }
+    ];
+
+    function selectClass(c) {
+      document.getElementById('inspect-code').innerText = c.id;
+      document.getElementById('inspect-title').innerText = c.title;
+      document.getElementById('inspect-dosen').innerText = c.dosen;
+      document.getElementById('inspect-room').innerText = c.room;
+      document.getElementById('inspect-time').innerText = `${c.day}, ${c.time.split(' - ')[0]}`;
+      document.getElementById('inspect-sks').innerText = c.sks;
+      document.getElementById('inspect-semester').innerText = c.semester;
+      document.getElementById('inspect-enrolled').innerText = c.enrolled;
+    }
+
+    function renderMatrix(items, hasConflict = false) {
+      const slots = [
+        { label: 'Slot 1 (Pagi)', hours: '08:00 - 10:30' },
+        { label: 'Slot 2 (Siang)', hours: '10:45 - 13:15' },
+        { label: 'Slot 3 (Sore)', hours: '13:30 - 16:00' },
+        { label: 'Slot 4 (Malam)', hours: '16:15 - 18:45' }
+      ];
+
+      let html = '';
+
+      slots.forEach((slot, slotIdx) => {
+        html += `
+          <div class="grid grid-cols-6 divide-x divide-apple-border min-h-[115px]">
+            <!-- Time Column -->
+            <div class="p-3 bg-[#FBFBFD] flex flex-col justify-start">
+              <span class="font-mono text-xs font-bold text-apple-text">${slot.hours}</span>
+              <span class="text-[10px] text-apple-secondary font-mono mt-0.5">${slot.label}</span>
+            </div>
+        `;
+
+        days.forEach(day => {
+          const matched = items.filter(it => it.day === day && it.slotIdx === slotIdx);
+
+          html += `<div class="p-2 bg-white flex flex-col gap-2 relative">`;
+
+          if (matched.length > 0) {
+            matched.forEach(it => {
+              if (hasConflict && it.id === 'TIF204-A') {
+                html += `
+                  <div onclick='selectClass(${JSON.stringify(it)})' class="p-2.5 rounded-xl border border-apple-red/30 bg-[#FFF2F1] text-apple-text shadow-apple-sm cursor-pointer hover:border-apple-red transition-all">
+                    <div class="flex items-center justify-between font-mono text-[10px]">
+                      <span class="font-bold text-apple-red flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-apple-red"></span>
+                        <span>BENTROK RUANG</span>
+                      </span>
+                      <span class="text-apple-red font-semibold">HC-2</span>
+                    </div>
+                    <p class="font-bold text-xs text-apple-text mt-1 leading-snug">${it.title}</p>
+                    <p class="text-[11px] text-apple-secondary truncate">${it.dosen}</p>
+                    <div class="mt-2 pt-1.5 border-t border-apple-red/20 flex items-center justify-between text-[10px] font-mono text-apple-red">
+                      <span>R.301 Overlap</span>
+                      <span class="underline font-medium">Atur Slot</span>
+                    </div>
+                  </div>
+                `;
+              } else {
+                html += `
+                  <div onclick='selectClass(${JSON.stringify(it)})' class="p-2.5 rounded-xl border border-apple-border bg-white shadow-apple-sm hover:shadow-apple-card hover:border-black/20 text-apple-text cursor-pointer transition-all relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 ${it.accentBar} rounded-l-xl"></div>
+                    <div class="flex items-center justify-between pl-1 font-mono text-[10px]">
+                      <span class="font-semibold px-1.5 py-0.2 rounded border ${it.tagBg}">${it.id}</span>
+                      <span class="text-apple-secondary font-mono">${it.enrolled.split(' ')[0]} Mhs</span>
+                    </div>
+                    <p class="font-bold text-xs text-apple-text mt-1.5 pl-1 leading-tight group-hover:text-apple-blue transition">${it.title}</p>
+                    <p class="text-[11px] text-apple-secondary truncate pl-1 mt-0.5">${it.dosen}</p>
+                    <div class="mt-2 pt-1.5 pl-1 border-t border-apple-border flex items-center justify-between text-[10px] text-apple-secondary font-mono">
+                      <span>${it.room.split('•')[1] || it.room}</span>
+                      <span class="text-apple-green font-medium">★ ${it.score}</span>
+                    </div>
+                  </div>
+                `;
+              }
+            });
+          } else {
+            html += `
+              <div class="h-full w-full rounded-xl border border-dashed border-black/5 flex items-center justify-center text-apple-tertiary text-[10px] font-mono hover:border-black/20 transition cursor-pointer">
+                + Tambah
+              </div>
+            `;
+          }
+
+          html += `</div>`;
+        });
+
+        html += `</div>`;
+      });
+
+      return html;
+    }
+
+    function switchState(state) {
+      const container = document.getElementById('matrix-rows-container');
+      const metric = document.getElementById('solver-metric-badge');
+      const footerStatus = document.getElementById('status-footer-text');
+
+      ['optimal', 'conflict', 'solving', 'empty'].forEach(s => {
+        const btn = document.getElementById(`btn-${s}`);
+        btn.className = (s === state)
+          ? 'px-2.5 py-1 text-[11px] font-medium rounded-md bg-white text-apple-text shadow-apple-pill transition-all'
+          : 'px-2.5 py-1 text-[11px] font-medium rounded-md text-apple-secondary hover:text-apple-text transition-all';
+      });
+
+      if (state === 'optimal') {
+        container.innerHTML = renderMatrix(classesData, false);
+        metric.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-apple-green"></span><span>Solusi: 38ms (0 Pelanggaran)</span>';
+        footerStatus.innerText = '32 / 32 Kelas Terjadwal';
+        selectClass(classesData[0]);
+      } else if (state === 'conflict') {
+        container.innerHTML = renderMatrix(classesData, true);
+        metric.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-apple-red"></span><span class="text-apple-red font-semibold">1 Konflik Ruangan (HC-2)</span>';
+        footerStatus.innerText = '31 / 32 Berhasil (1 Konflik)';
+        selectClass(classesData[0]);
+      } else if (state === 'solving') {
+        container.innerHTML = `
+          <div class="p-16 flex flex-col items-center justify-center text-center">
+            <div class="w-7 h-7 border-2 border-apple-blue border-t-transparent rounded-full animate-spin mb-3"></div>
+            <p class="font-mono text-xs font-semibold text-apple-text">MRV_BACKTRACK_SOLVER_RUNNING</p>
+            <p class="text-xs text-apple-secondary max-w-sm mt-1">Mengevaluasi variabel domain minimum untuk 32 jadwal kelas...</p>
+          </div>
+        `;
+        metric.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-apple-blue animate-ping"></span><span>Menghitung Kombinasi...</span>';
+        footerStatus.innerText = 'Proses Kalkulasi...';
+      } else if (state === 'empty') {
+        container.innerHTML = `
+          <div class="p-16 flex flex-col items-center justify-center text-center">
+            <div class="w-10 h-10 rounded-2xl bg-[#F5F5F7] border border-black/5 flex items-center justify-center mb-3 text-apple-secondary font-mono">
+              0/0
+            </div>
+            <h4 class="font-bold text-sm text-apple-text">Belum Ada Sesi Perkuliahan</h4>
+            <p class="text-xs text-apple-secondary max-w-xs mt-1">Data master kurikulum dan ruangan siap diproses. Klik tombol di bawah untuk membuat jadwal otomatis.</p>
+            <button onclick="triggerSolve()" class="mt-4 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-apple-blue text-white shadow-apple-sm hover:bg-apple-blue-hover transition">
+              Jalankan Solver Otomatis
+            </button>
+          </div>
+        `;
+        metric.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-apple-secondary"></span><span>Draft Kosong</span>';
+        footerStatus.innerText = '0 / 32 Kelas Terjadwal';
+      }
+    }
+
+    function triggerSolve() {
+      switchState('solving');
+      setTimeout(() => {
+        switchState('optimal');
+      }, 700);
+    }
+
+    // Default startup
+    switchState('optimal');
+  </script>
+</body>
+</html>

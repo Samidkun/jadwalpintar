@@ -1,0 +1,22 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../**/*.jsx';
+@source '../**/*.ts';
+@source '../**/*.tsx';
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Plus Jakarta Sans", sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root {
+  --color-canvas: #F5F5F7;
+  --color-card: #FFFFFF;
+  --color-card-subtle: #FBFBFD;
+  --color-border: rgba(0, 0, 0, 0.07);
+  --color-primary: #0071E3;
+}

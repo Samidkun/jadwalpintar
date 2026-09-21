@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: jadwalpintar
+      POSTGRES_PASSWORD: jadwalpass
+      POSTGRES_DB: jadwalpintar
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jadwalpintar -d jadwalpintar"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:

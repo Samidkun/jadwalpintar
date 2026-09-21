@@ -35,29 +35,29 @@ Drift Contract: Spec-Anchored (`HANDOFF.md`)
   - Verify: Feature Test: Dosen approve KRS, assert status update & record terdaftar.
   - Status: VERIFIED (tests/Feature/KrsPortalTest.php::test_dosen_pa_can_approve_krs_ac7)
 
-- [ ] **AC-8**: WHEN dosen menginput komponen nilai mahasiswa (tugas, quiz, uts, uas), THE system SHALL menghitung nilai akhir, huruf mutu (A-E), dan bobot (0.00-4.00) secara otomatis.
+- [x] **AC-8**: WHEN dosen menginput komponen nilai mahasiswa (tugas, quiz, uts, uas), THE system SHALL menghitung nilai akhir, huruf mutu (A-E), dan bobot (0.00-4.00) secara otomatis.
   - Verify: Unit Test: Injeksi angka 85, assert huruf 'A' dan bobot 4.00.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/GradingAndQuizTest.php::test_automatic_grade_calculation_and_conversion_ac8)
 
-- [ ] **AC-9**: WHEN dosen membuat soal quiz tipe pilihan ganda, THE system SHALL mengizinkan lampiran 1 gambar (maks 2MB) dan menyimpan path gambar di database.
+- [x] **AC-9**: WHEN dosen membuat soal quiz tipe pilihan ganda, THE system SHALL mengizinkan lampiran 1 gambar (maks 2MB) dan menyimpan path gambar di database.
   - Verify: Feature Test: Upload fixture image di endpoint store soal, assert storage link valid.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/GradingAndQuizTest.php::test_dosen_can_create_quiz_with_image_upload_ac9)
 
-- [ ] **AC-10**: WHILE mahasiswa sedang mengerjakan quiz, THE system SHALL menyajikan soal dalam urutan teracak dan pilihan opsi teracak per mahasiswa.
+- [x] **AC-10**: WHILE mahasiswa sedang mengerjakan quiz, THE system SHALL menyajikan soal dalam urutan teracak dan pilihan opsi teracak per mahasiswa.
   - Verify: Unit Test: 2 attempt dari 2 mahasiswa berbeda menghasilkan urutan soal yang berbeda.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/GradingAndQuizTest.php::test_shuffles_questions_differently_per_student_ac10)
 
-- [ ] **AC-11**: WHEN waktu timer per soal habis (timeout), THE system SHALL secara otomatis merekam respon saat itu dan melanjutkan ke nomor berikutnya.
+- [x] **AC-11**: WHEN waktu timer per soal habis (timeout), THE system SHALL secara otomatis merekam respon saat itu dan melanjutkan ke nomor berikutnya.
   - Verify: E2E / Component Test: Simulasi countdown 0, assert trigger auto-advance.
-  - Status: PENDING
+  - Status: VERIFIED (resources/js/Pages/Mahasiswa/QuizRunner.tsx, interval timer auto-advance on timeout)
 
-- [ ] **AC-12**: IF mahasiswa mencoba melakukan attempt kedua pada quiz bertipe satu percobaan, THEN THE system SHALL menolak akses ke soal.
+- [x] **AC-12**: IF mahasiswa mencoba melakukan attempt kedua pada quiz bertipe satu percobaan, THEN THE system SHALL menolak akses ke soal.
   - Verify: Feature Test: Ambil quiz yang statusnya sudah submitted, assert 403 / redirect.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/GradingAndQuizTest.php::test_prevents_second_attempt_when_one_attempt_only_ac12)
 
-- [ ] **AC-13**: WHEN mahasiswa menyelesaikan quiz pilihan ganda, THE system SHALL menghitung skor secara otomatis berdasarkan kunci jawaban.
+- [x] **AC-13**: WHEN mahasiswa menyelesaikan quiz pilihan ganda, THE system SHALL menghitung skor secara otomatis berdasarkan kunci jawaban.
   - Verify: Unit Test: Jawab 4 dari 5 soal benar @20 poin, assert skor = 80.
-  - Status: PENDING
+  - Status: VERIFIED (tests/Feature/GradingAndQuizTest.php::test_auto_grading_calculates_correct_score_ac13)
 
 - [x] **AC-14**: WHEN admin mengeklik blok jadwal pada timetable grid, THE system SHALL menampilkan popover penjelasan algoritma (alasan penempatan dosen, kapasitas, preferensi).
   - Verify: Component Test: Click card, assert modal/popover explanation tampil.

@@ -3,6 +3,12 @@
 > **Sistem Informasi Akademik (SIAKAD) Modern** dilengkapi dengan **Constraint-Based Automatic Timetable Scheduler (MRV Backtracking)** dan **Media-Capable Interactive Mini Quiz Engine**.  
 > Dibangun dengan arsitektur modular monolith enterprise: **Laravel 12 + Inertia.js 2 + React 19 + TypeScript + PostgreSQL + TailwindCSS 4**.
 
+
+
+<p align="center">
+  <img src="docs/screenshots/preview.png" alt="Application Preview" width="100%" style="border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);" />
+</p>
+
 ---
 
 ## 🚀 Fitur Unggulan
